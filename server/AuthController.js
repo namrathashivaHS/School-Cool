@@ -44,13 +44,14 @@ const createToken = (id) => {
     });
     };
 let msg;
+
 const Login = async (req, res, next) => {
   const { error } = userLoginSchema.validate(req.body);
   const { email, password } = req.body;
   if (error){
     msg=error.message;
     //console.log("error message 1");
-    return res.status(400).json({msg});
+    return res.json({success:false,message:msg});
   }
   try {
     
@@ -60,9 +61,7 @@ const Login = async (req, res, next) => {
       const compareResult = await bcrypt.compare(password, user.password);
       if (!compareResult){
         msg="Invalid credentials. Please check email/password";
-        return res
-          .status(404)
-          .json({msg});
+        return res.json({success:false,message:msg});
       }
       const token = createToken(user._id);
       res.cookie('jwt', token, {withCredentials:true, httpOnly: false, maxAge: maxAge * 1000 });
